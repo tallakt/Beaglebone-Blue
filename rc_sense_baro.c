@@ -1,6 +1,8 @@
 /*******************************************************************************
-
+Scripts modified from Strawson Design Example Library
+RenierSF1 2017
 *******************************************************************************/
+
 
 // usefulincludes is a collection of common system includes for the lazy
 // This is not necessary for roboticscape projects but here for convenience
