@@ -25,11 +25,6 @@ void clrscr()
 
 /*******************************************************************************
 * int main() 
-*
-* This template main function contains these critical components
-* - call to rc_initialize() at the beginning
-* - main while loop that checks for EXITING condition
-* - rc_cleanup() at the end
 *******************************************************************************/
 int main(){
 	rc_imu_data_t data; //struct to hold new data
