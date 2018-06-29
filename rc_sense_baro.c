@@ -66,7 +66,7 @@ int main(){
 		struct timespec now;
 		clock_gettime(CLOCK_MONOTONIC, &now);
 		long int time = ((unsigned long) now.tv_sec)*1000000LL + now.tv_nsec / 1000;
-		printf("time:%lu,", time);
+		printf("%lu,", time);
 
 		// handle other states
 		if(rc_read_accel_data(&data)<0){
