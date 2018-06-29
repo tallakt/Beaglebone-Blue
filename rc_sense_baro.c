@@ -17,10 +17,6 @@ RenierSF1 2017
 void on_pause_pressed();
 void on_pause_released();
 
-void clrscr()
-{
-    system("@cls||clear");
-}
 
 
 /*******************************************************************************
@@ -35,10 +31,8 @@ int main(){
 		return -1;
 	}
 
-	clrscr();
 
 		// do your own initialization here
-	printf("\nHello BeagleBone\n");
 	// done initializing so set state to RUNNING
 	rc_set_state(RUNNING); 
 
@@ -57,27 +51,30 @@ int main(){
 	}
 
 
-	printf("   Accel XYZ(m/s^2)  |");
-	printf("   Gyro XYZ (deg/s)  |");
-	printf("  Mag Field XYZ(uT)  |");
-	printf(" Temp (C) |");
-	printf("  Baro Temp (C) |");
-	printf(" Pressure  |");
-	printf(" Altitude |");
+	printf("time,a_x,a_y,a_z,");
+	printf("omega_x,omega_y,omega_z,");
+	printf("mag_x, mag_y, mag_z,");
+	printf("temp,");
+	printf("baro_temp,");
+	printf("pressure,");
+	printf("altitude");
 	printf("\n");
-
 
 
 	// Keep looping until state changes to EXITING
 	while(rc_get_state()!=EXITING){
-		printf("\r");
+		struct timespec now;
+		clock_gettime(CLOCK_MONOTONIC, &now);
+		long int time = ((unsigned long) now.tv_sec)*1000000LL + now.tv_nsec / 1000;
+		printf("time:%lu,", time);
+
 		// handle other states
 		if(rc_read_accel_data(&data)<0){
 			printf("read accel data failed\n");
 		}
 		else
 		{
-			printf("%6.2f %6.2f %6.2f |",	data.accel[0],\
+			printf("%.2f,%.2f,%.2f,",	data.accel[0],\
 											data.accel[1],\
 											data.accel[2]);
 		}
@@ -88,7 +85,7 @@ int main(){
 		else
 		{
 
-			printf("%6.1f %6.1f %6.1f |",	data.gyro[0],\
+			printf("%.1f,%.1f,%.1f,",	data.gyro[0],\
 											data.gyro[1],\
 											data.gyro[2]);
 		}
@@ -97,7 +94,7 @@ int main(){
 			printf("read mag data failed\n");
 		}
 		else {
-			printf("%6.1f %6.1f %6.1f |",	data.mag[0],\
+			printf("%.1f,%.1f,%.1f,",	data.mag[0],\
 											data.mag[1],\
 											data.mag[2]);
 		}
@@ -105,7 +102,7 @@ int main(){
 		if(rc_read_imu_temp(&data)<0){
 			printf("read temp data failed\n");
 		}
-		else printf("   %4.1f   |", data.temp);
+		else printf("%.1f,", data.temp);
 		// always sleep at some point
 
 		if(rc_read_barometer()<0){
@@ -120,13 +117,13 @@ int main(){
 		pressure = rc_bmp_get_pressure_pa();
 		altitude = rc_bmp_get_altitude_m();
 
-		printf("    %6.2fC     |", temp);
-		printf("%7.2fkpa |", pressure/1000.0);
-		printf("%8.2fm |", altitude);
+		printf("%.2f,", temp);
+		printf("%.2f,", pressure);
+		printf("%.2f\n", altitude);
 		
 		
 		fflush(stdout);
-		rc_usleep(100000);
+		rc_usleep(10000);
 	}
 	
 	// exit cleanly
