@@ -23,13 +23,15 @@ void on_pause_released();
 * int main() 
 *******************************************************************************/
 int main(){
-	rc_imu_data_t data; //struct to hold new data
+	rc_mpu_data_t data; //struct to hold new data
 	double temp, pressure, altitude;
 	// always initialize cape library first
+	/*
 	if(rc_initialize()){
 		fprintf(stderr,"ERROR: failed to initialize rc_initialize(), are you root?\n");
 		return -1;
 	}
+	*/
 
 
 		// do your own initialization here
@@ -37,18 +39,20 @@ int main(){
 	rc_set_state(RUNNING); 
 
 	// use defaults for now, except also enable magnetometer.
-	rc_imu_config_t conf = rc_default_imu_config();
+	rc_mpu_config_t conf = rc_mpu_default_config();
 	conf.enable_magnetometer=1;
 
-	if(rc_initialize_imu(&data, conf)){
-		fprintf(stderr,"rc_initialize_imu_failed\n");
+	if(rc_mpu_initialize(&data, conf)){
+		fprintf(stderr,"rc_mpu_initialize_failed\n");
 		return -1;
 	}
 
+	/*
 	if(rc_initialize_barometer(OVERSAMPLE, INTERNAL_FILTER)<0){
 	fprintf(stderr,"ERROR: rc_initialize_barometer failed\n");
 	return -1;
 	}
+	*/
 
 
 	printf("time,a_x,a_y,a_z,");
@@ -69,7 +73,7 @@ int main(){
 		printf("%lu,", time);
 
 		// handle other states
-		if(rc_read_accel_data(&data)<0){
+		if(rc_mpu_read_accel(&data)<0){
 			printf("read accel data failed\n");
 		}
 		else
@@ -79,7 +83,7 @@ int main(){
 											data.accel[2]);
 		}
 
-		if(rc_read_gyro_data(&data)<0){
+		if(rc_mpu_read_gyro(&data)<0){
 			printf("read gyro data failed\n");
 		}
 		else
@@ -90,7 +94,7 @@ int main(){
 											data.gyro[2]);
 		}
 
-		if(rc_read_mag_data(&data)<0){
+		if(rc_mpu_read_mag(&data)<0){
 			printf("read mag data failed\n");
 		}
 		else {
@@ -99,23 +103,25 @@ int main(){
 											data.mag[2]);
 		}
 
-		if(rc_read_imu_temp(&data)<0){
+		if(rc_mpu_read_temp(&data)<0){
 			printf("read temp data failed\n");
 		}
 		else printf("%.1f,", data.temp);
 		// always sleep at some point
 
+		/*
 		if(rc_read_barometer()<0){
 			fprintf(stderr,"\rERROR: Can't read Barometer");
 			fflush(stdout);
 			continue;
 		}
+		*/
 
 		// if we got here, new data was read and is ready to be accessed.
 		// these are very fast function calls and don't actually use i2c
-		temp = rc_bmp_get_temperature();
-		pressure = rc_bmp_get_pressure_pa();
-		altitude = rc_bmp_get_altitude_m();
+		temp = data.temp;
+		pressure = 0; //rc_bmp_get_pressure_pa();
+		altitude = 0; //rc_bmp_get_altitude_m();
 
 		printf("%.2f,", temp);
 		printf("%.2f,", pressure);
@@ -127,9 +133,9 @@ int main(){
 	}
 	
 	// exit cleanly
-	rc_power_off_barometer();
-	rc_power_off_imu();
-	rc_cleanup();
+	//rc_power_off_barometer();
+	rc_mpu_power_off();
+	//rc_cleanup();
 	return 0;
 }
 
