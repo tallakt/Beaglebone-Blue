@@ -3,6 +3,7 @@ Scripts modified from Strawson Design Example Library
 RenierSF1 2017
 *******************************************************************************/
 
+// http://strawsondesign.com/docs/librobotcontrol/group___barometer___b_m_p.html
 
 // usefulincludes is a collection of common system includes for the lazy
 // This is not necessary for roboticscape projects but here for convenience
@@ -24,7 +25,8 @@ void on_pause_released();
 *******************************************************************************/
 int main(){
 	rc_mpu_data_t data; //struct to hold new data
-	double temp, pressure, altitude;
+	rc_bmp_data_t bmp_data; //struct to hold new data
+
 	// always initialize cape library first
 	/*
 	if(rc_initialize()){
@@ -47,12 +49,10 @@ int main(){
 		return -1;
 	}
 
-	/*
-	if(rc_initialize_barometer(OVERSAMPLE, INTERNAL_FILTER)<0){
-	fprintf(stderr,"ERROR: rc_initialize_barometer failed\n");
-	return -1;
+	if(rc_bmp_init(OVERSAMPLE, INTERNAL_FILTER)<0){
+		fprintf(stderr,"ERROR: rc_bmp_init failed\n");
+		return -1;
 	}
-	*/
 
 
 	printf("time,a_x,a_y,a_z,");
@@ -109,23 +109,15 @@ int main(){
 		else printf("%.1f,", data.temp);
 		// always sleep at some point
 
-		/*
-		if(rc_read_barometer()<0){
+		if(rc_bmp_read(&bmp_data)<0){
 			fprintf(stderr,"\rERROR: Can't read Barometer");
 			fflush(stdout);
 			continue;
 		}
-		*/
 
-		// if we got here, new data was read and is ready to be accessed.
-		// these are very fast function calls and don't actually use i2c
-		temp = data.temp;
-		pressure = 0; //rc_bmp_get_pressure_pa();
-		altitude = 0; //rc_bmp_get_altitude_m();
-
-		printf("%.2f,", temp);
-		printf("%.2f,", pressure);
-		printf("%.2f\n", altitude);
+		printf("%.2f,", bmp_data.temp_c);
+		printf("%.2f,", bmp_data.pressure_pa);
+		printf("%.2f\n", bmp_data.alt_m);
 		
 		
 		fflush(stdout);
