@@ -1,0 +1,15 @@
+[Unit]
+Description="IMU Sensor Logger"
+Wants=
+After=
+
+[Service]
+; User=debian
+WorkingDirectory=/home/debian
+Environment="HOME=/home/debian"
+ExecStart=/bin/sh -c "NUMBER=$(ls [0-9]* | sed 's/_/ _/' | sort -rn | awk '{printf \"%03d\", $1 + 1; exit}'); echo $NUMBER; /usr/local/bin/rc_sense_baro > $NUMBER.imu.log.txt" 
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target
